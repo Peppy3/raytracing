@@ -69,6 +69,22 @@ struct Image *Image_flip_top_bottom(struct Image *img) {
 	return img;
 }
 
+// Flips an image horizontally
+struct Image *Image_flip_left_right(struct Image *img) {
+	uint8_v4 tmp = {0};
+	uint32_t image_width = img->width;
+
+	for (size_t j = 0; j < img->height; j++) {
+		uint8_v4 *row = &(img->data[j * image_width]);
+		for (size_t i = 0; i < (image_width / 2); i++) {
+			tmp = row[i];
+			row[i] = row[image_width - i];
+			row[image_width - i] = tmp;
+		}
+	}
+
+	return img;
+}
 
 int Image_save_as_ppm(const struct Image *img, const char *filename) {
 	FILE *fp = NULL;
@@ -164,6 +180,19 @@ int Image_save_as_bmp(const struct Image *img, const char *filename) {
 			tmp = bgr_img[i];
 			bgr_img[i] = bgr_img[array_size - i];
 			bgr_img[array_size - i] = tmp;
+		}
+	}
+	{
+		uint8_v3 tmp = {0};
+		uint32_t image_width = img->width;
+
+		for (size_t j = 0; j < img->height; j++) {
+			uint8_v3 *row = &(bgr_img[j * image_width]);
+			for (size_t i = 0; i < (image_width / 2); i++) {
+				tmp = row[i];
+				row[i] = row[image_width - i];
+				row[image_width - i] = tmp;
+			}
 		}
 	}
 	

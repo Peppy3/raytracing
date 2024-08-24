@@ -96,6 +96,7 @@ inline float float_v3_length(const float_v3 vec) {
 inline float_v3 float_v3_unit_vector(const float_v3 vec) {
 	return float_v3_div(vec, float_v3_length(vec));
 }
+#define float_v3_norm(vec) float_v3_unit_vector(vec)
 
 static inline float_v3 float_v3_rand(void) {
 	return (float_v3){random_float(), random_float(), random_float()}; 

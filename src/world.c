@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <assert.h>
 
+#include <math.h>
+
 #include <def.h>
 #include <interval.h>
 #include <vec.h>
@@ -12,6 +14,13 @@
 #include <image.h>
 
 #include <world.h>
+
+static inline float linear_to_gamma(float linear_component) {
+	if (linear_component > 0.0f) {
+		return sqrtf(linear_component);
+	}
+	return 0.0f;
+}
 
 bool World_hit(const struct World *world, const Ray *r, 
 		Interval ray_t, struct HitRecord *record) {
@@ -88,8 +97,11 @@ struct Image *World_render(struct World *world, size_t cam_idx) {
 
 			pixel_color = float_v4_scale(pixel_color, cam->pixels_samples_scale);
 
-			Interval intensity = {0.0f, 0.999f};
+			pixel_color.x = linear_to_gamma(pixel_color.x);
+			pixel_color.y = linear_to_gamma(pixel_color.y);
+			pixel_color.z = linear_to_gamma(pixel_color.z);
 
+			Interval intensity = {0.0f, 0.999f};
 			pixel_color.x = 256.0f * Interval_clamp(intensity, pixel_color.x);
 			pixel_color.y = 256.0f * Interval_clamp(intensity, pixel_color.y);
 			pixel_color.z = 256.0f * Interval_clamp(intensity, pixel_color.z);

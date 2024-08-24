@@ -15,10 +15,12 @@ struct Camera {
 	float pixels_samples_scale;
 
 	float focal_length;
+	float vertical_fov;
 	float viewport_height;
 	float viewport_width;
 
-	point3 camera_center;
+	point3 center;
+	float_v3 u, v, w;
 
 	float_v3 viewport_v;
 	float_v3 viewport_u;
@@ -34,12 +36,14 @@ struct CameraOptions {
 	uint32_t image_width;
 	uint32_t image_height;
 
-	float focal_length;
+	float vertical_fov;
 
 	uint32_t samples_per_pixel;
 	uint32_t max_depth;
 
-	point3 camera_center;
+	point3 center;
+	point3 lookat;
+	float_v3 vup;
 };
 
 void Camera_new(struct Camera *cam, const struct CameraOptions *options);

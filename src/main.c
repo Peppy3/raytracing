@@ -32,10 +32,13 @@ int main(void) {
 		.image_width = image_width,
 		.image_height = image_height,
 
-		.focal_length = 1.0f,
+		.vertical_fov = 20.0f,
 		.max_depth = 100,
 		.samples_per_pixel = 1024,
-		.camera_center = (point3){0.0f, 0.0f, 0.0f}
+
+		.center = (point3){-2.0f, 2.0f, 1.0f},
+		.lookat = (point3){0.0f, 0.0f, -1.0f},
+		.vup = (float_v3){0.0f, 1.0f, 0.0f}
 	};
 
 	struct Camera cam1;
@@ -52,15 +55,15 @@ int main(void) {
 	Lambertian_new(&mat_ground, (float_v3){0.8f, 0.8f, 0.0f});
 	Lambertian_new(&mat_center, (float_v3){0.1f, 0.2f, 0.5f});
 	Dialectric_new(&mat_left, 1.50f);
-	Dialectric_new(&mat_bubble, 1.0f / 1.33f);
+	Dialectric_new(&mat_bubble, 1.0f / 1.50f);
 	Metal_new(&mat_right, (float_v3){0.8f, 0.6f, 0.2f}, 1.0f);
 	
 	struct Sphere s_ground, s_center, s_left, s_bubble, s_right;
 	Sphere_new(&s_ground, (point3){0.0f, -100.5f, -1.0f}, 100.0f, &mat_ground.mat);
 	Sphere_new(&s_center, (point3){0.0f, 0.0f, -1.2f},    0.5f, &mat_center.mat);
-	Sphere_new(&s_left,   (point3){1.0f, 0.0f, -1.0f},    0.5f, &mat_left.mat);
-	Sphere_new(&s_bubble, (point3){1.0f, 0.0f, -1.0f},    0.4f, &mat_bubble.mat);
-	Sphere_new(&s_right,  (point3){-1.0f, 0.0f, -1.0f},   0.5f, &mat_right.mat);
+	Sphere_new(&s_left,   (point3){-1.0f, 0.0f, -1.0f},   0.5f, &mat_left.mat);
+	Sphere_new(&s_bubble, (point3){-1.0f, 0.0f, -1.0f},   0.4f, &mat_bubble.mat);
+	Sphere_new(&s_right,  (point3){1.0f, 0.0f, -1.0f},    0.5f, &mat_right.mat);
 
 	Hittable *hittable_list[] = {
 		&s_ground.hittable, 
