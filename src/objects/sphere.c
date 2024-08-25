@@ -44,8 +44,6 @@ bool Sphere_hit(const Hittable *obj, const Ray *r,
 
 	record->t = root;
 	record->position = Ray_at(r, record->t);
-	record->normal = float_v3_div(float_v3_sub(record->position, s->center), s->radius);
-
 	float_v3 outward_normal = float_v3_div(float_v3_sub(record->position, s->center), s->radius);
 	HitRecord_set_face_normal(record, r, outward_normal);
 	record->mat = s->mat;

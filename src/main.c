@@ -11,6 +11,7 @@
 #include <world.h>
 
 #include <objects/sphere.h>
+#include <objects/triangle.h>
 
 #include <materials/lambertian.h>
 #include <materials/metal.h>
@@ -28,16 +29,27 @@ int main(void) {
 
 	// Camera
 
+	// TODO: full rotation in degrees and pass that to the camera
+	float yaw = 64.5593f;
+	float pitch = 46.6919f;
+
 	struct CameraOptions cam_opts1 = {
 		.image_width = image_width,
 		.image_height = image_height,
 
 		.vertical_fov = 20.0f,
-		.max_depth = 30,
-		.samples_per_pixel = 128,
+		.focus_dist = 1.2f,
+		.defocus_angle = 0.6f,
 
-		.center = (point3){-2.0f, 2.0f, 1.0f},
-		.lookat = (point3){0.0f, 0.0f, -1.0f},
+		.max_depth = 30,
+		.samples_per_pixel = 64,
+
+		.center = (point3){7.35889f, -6.92579f, 4.95831f},
+		.lookat = (point3){
+			.x = cosf(yaw) * cosf(pitch), 
+			.y = sinf(yaw) * cosf(pitch), 
+			.z = sin(pitch)
+		},
 		.vup = (float_v3){0.0f, 1.0f, 0.0f}
 	};
 
@@ -48,36 +60,57 @@ int main(void) {
 	
 	// World
 
-	struct Lambertian mat_ground, mat_center;
-	struct Metal mat_right;
-	struct Dialectric mat_left, mat_bubble;
+	struct Lambertian mat_ground, mat_tri;
 
 	Lambertian_new(&mat_ground, (float_v3){0.8f, 0.8f, 0.0f});
-	Lambertian_new(&mat_center, (float_v3){0.1f, 0.2f, 0.5f});
-	Dialectric_new(&mat_left, 1.50f);
-	Dialectric_new(&mat_bubble, 1.0f / 1.50f);
-	Metal_new(&mat_right, (float_v3){0.8f, 0.6f, 0.2f}, 1.0f);
+	Lambertian_new(&mat_tri, (float_v3){0.6f, 0.4f, 0.8f});
+
+	Hittable tri_hit = {Triangle_hit};
+	//const size_t cube_tris = 12;
+	struct Triangle tris[12] = {
+		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1, -1}, {-1,  1, -1}, { 0,  0, -1}},
+		{tri_hit, &mat_tri.mat, { 1, -1, -1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  0, -1}},
+		
+		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1,  1, -1}, { 1,  1,  1}, { 0,  1,  0}},
+		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  1,  0}},
+
+		{tri_hit, &mat_tri.mat, {-1, -1,  1}, {-1,  1, -1}, {-1, -1, -1}, {-1,  0,  0}},
+		{tri_hit, &mat_tri.mat, {-1, -1,  1}, {-1,  1, -1}, {-1,  1,  1}, {-1,  0,  0}},
+
+		{tri_hit, &mat_tri.mat, { 1,  1, -1}, { 1, -1,  1}, { 1,  1,  1}, { 1,  0,  0}},
+		{tri_hit, &mat_tri.mat, { 1,  1, -1}, { 1, -1,  1}, { 1, -1, -1}, { 1,  0,  0}},
+		
+		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1,  1}, {-1, -1, -1}, { 0, -1,  0}},
+		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1,  1}, { 1, -1,  1}, { 0, -1,  0}},
+
+		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1, -1,  1}, { 1,  1,  1}, { 0,  0,  1}},
+		{tri_hit, &mat_tri.mat, {-1,  1,  1}, {-1, -1,  1}, { 1, -1,  1}, { 0,  0,  1}},
+	};
 	
-	struct Sphere s_ground, s_center, s_left, s_bubble, s_right;
+	struct Sphere s_ground;
 	Sphere_new(&s_ground, (point3){0.0f, -100.5f, -1.0f}, 100.0f, &mat_ground.mat);
-	Sphere_new(&s_center, (point3){0.0f, 0.0f, -1.2f},    0.5f, &mat_center.mat);
-	Sphere_new(&s_left,   (point3){-1.0f, 0.0f, -1.0f},   0.5f, &mat_left.mat);
-	Sphere_new(&s_bubble, (point3){-1.0f, 0.0f, -1.0f},   0.4f, &mat_bubble.mat);
-	Sphere_new(&s_right,  (point3){1.0f, 0.0f, -1.0f},    0.5f, &mat_right.mat);
 
 	Hittable *hittable_list[] = {
-		&s_ground.hittable, 
-		&s_center.hittable,
-		&s_left.hittable,
-		&s_bubble.hittable,
-		&s_right.hittable
+		//&s_ground.hittable, 
+		&tris[0].hittable,
+		&tris[1].hittable,
+		&tris[2].hittable,
+		&tris[3].hittable,
+		&tris[4].hittable,
+		&tris[5].hittable,
+		&tris[6].hittable,
+		&tris[7].hittable,
+		&tris[8].hittable,
+		&tris[9].hittable,
+		&tris[10].hittable,
+		&tris[11].hittable
 	};
 
 	struct World world = {
 		.cameras = cam_list,
 		.camera_list_len = 1,
 		.obj_list = hittable_list,
-		.obj_list_len = 5
+		.obj_list_len = 12
 	};
 
 
@@ -89,7 +122,7 @@ int main(void) {
 		return 1;
 	}
 	
-	puts("Saving image");
+	puts("Saving image\x07");
 	Image_save_as_bmp(img, "out.bmp");
 
 	free(img);

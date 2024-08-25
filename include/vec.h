@@ -112,7 +112,7 @@ static inline float_v3 float_v3_rand_min_max(float min, float max) {
 
 // returns true if close to zero in all directions
 inline bool float_v3_near_zero(const float_v3 vec) {
-	float s = 1e-8;
+	const float s = 1e-8;
 	return (fabsf(vec.x) < s) && (fabsf(vec.y) < s) && (fabsf(vec.z) < s);
 }
 

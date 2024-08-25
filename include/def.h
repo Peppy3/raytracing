@@ -8,6 +8,7 @@
 
 // random defines
 
+#define EPSILON 1e-8
 #define PI 3.1415926535897932385
 
 #define degrees_to_radians(d) ((d) * PI / 180.0)

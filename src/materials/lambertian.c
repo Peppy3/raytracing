@@ -21,7 +21,10 @@ bool Lambertian_scatter(struct Material *mat, const Ray *r_in,
 		scatter_direction = record->normal;
 	}
 	*scattered = (Ray){record->position, scatter_direction};
-
+	
+	if (!record->front_face) {
+		return false;
+	}
 	*attenuation = lamb->albedo;
 	return true;
 }

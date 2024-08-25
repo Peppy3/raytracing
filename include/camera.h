@@ -6,6 +6,15 @@
 #include <vec.h>
 #include <ray.h>
 
+// center
+// defocus_disk u, v
+// defocus_angle
+// pixel_delta u, v
+// pixel00_location
+//
+// max_depth
+// samples_per_pixel
+
 struct Camera {
 	uint32_t image_width;
 	uint32_t image_height;
@@ -16,11 +25,15 @@ struct Camera {
 
 	float focal_length;
 	float vertical_fov;
+	float defocus_angle;
 	float viewport_height;
 	float viewport_width;
 
 	point3 center;
 	float_v3 u, v, w;
+
+	float_v3 defocus_disk_u;
+	float_v3 defocus_disk_v;
 
 	float_v3 viewport_v;
 	float_v3 viewport_u;
@@ -37,6 +50,8 @@ struct CameraOptions {
 	uint32_t image_height;
 
 	float vertical_fov;
+	float focus_dist;
+	float defocus_angle;
 
 	uint32_t samples_per_pixel;
 	uint32_t max_depth;
