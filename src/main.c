@@ -20,7 +20,7 @@
 int main(void) {
 	
 	const float image_aspect_ratio = 16.0/9.0;
-	const uint32_t image_width = 400;
+	const uint32_t image_width = 640;
 	
 	// calculate the image height, make sure it's at least 1
 	uint32_t image_height = (uint32_t)(image_width / image_aspect_ratio);
@@ -33,8 +33,8 @@ int main(void) {
 		.image_height = image_height,
 
 		.vertical_fov = 20.0f,
-		.max_depth = 100,
-		.samples_per_pixel = 1024,
+		.max_depth = 30,
+		.samples_per_pixel = 128,
 
 		.center = (point3){-2.0f, 2.0f, 1.0f},
 		.lookat = (point3){0.0f, 0.0f, -1.0f},
@@ -85,10 +85,11 @@ int main(void) {
 	
 	struct Image *img = World_render(&world, 0);
 	if (img == NULL) {
-		fprintf(stderr, "Out of memory!");
+		fprintf(stderr, "Out of memory!\n");
 		return 1;
 	}
-
+	
+	puts("Saving image");
 	Image_save_as_bmp(img, "out.bmp");
 
 	free(img);
