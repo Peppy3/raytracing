@@ -98,6 +98,18 @@ inline float_v3 float_v3_unit_vector(const float_v3 vec) {
 }
 #define float_v3_norm(vec) float_v3_unit_vector(vec)
 
+float_v4 euler_to_quaternion(float roll, float pitch, float yaw);
+
+// both should be unit length
+float_v3 float_v3_rotate_by_quaternion(const float_v3 base, const float_v4 q);
+
+// base should be unit length
+inline float_v3 float_v3_rotate_euler(float roll, float pitch, float yaw, const float_v3 base) {
+	float_v4 q = euler_to_quaternion(roll, pitch, yaw);
+	
+	return float_v3_rotate_by_quaternion(base, q);
+}
+
 static inline float_v3 float_v3_rand(void) {
 	return (float_v3){random_float(), random_float(), random_float()}; 
 }
@@ -186,12 +198,50 @@ inline float_v4 float_v4_scale(const float_v4 vec, float scalar) {
 	return (float_v4) {vec.x * scalar, vec.y * scalar, vec.z * scalar, vec.w * scalar};
 }
 
+inline float_v4 float_v4_div(const float_v4 vec, float scalar) {
+	if (scalar == 0.0f) {
+		return (float_v4){0.0, 0.0, 0.0, 0.0};
+	}
+	return float_v4_scale(vec, 1/scalar);
+}
+
 inline float_v4 float_v4_add(const float_v4 lhs, const float_v4 rhs) {
 	return (float_v4) {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.y + rhs.y};
 }
 
 inline float_v4 float_v4_sub(const float_v4 lhs, const float_v4 rhs) {
 	return (float_v4) {lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w};
+}
+
+inline float float_v4_dot(const float_v4 lhs, const float_v4 rhs) {
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+}
+
+inline float float_v4_length_squared(const float_v4 vec) {
+	return float_v4_dot(vec, vec);
+}
+
+inline float float_v4_length(const float_v4 vec) {
+	return sqrtf(float_v4_dot(vec, vec));
+}
+
+inline float_v4 float_v4_unit_vector(const float_v4 vec) {
+	return float_v4_div(vec, float_v4_length(vec));
+}
+#define float_v4_norm(vec) float_v4_unit_vector(vec)
+
+inline int float_v4_print(float_v4 vec) {
+	return printf("(%f, %f, %f, %f)\n",
+		vec.x, vec.y, vec.z, vec.w);
+}
+
+inline float_v4 quaternion_multiply(const float_v4 lhs, const float_v4 rhs) {
+	return (float_v4) {
+		.w = lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z,
+		.x = lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+		.y = lhs.w * rhs.y - lhs.x * rhs.z + lhs.y * rhs.w + lhs.z * rhs.x,
+		.z = lhs.w * rhs.z + lhs.x * rhs.y - lhs.y * rhs.x + lhs.z * rhs.w,
+	};
 }
 
 inline uint8_v4 float_v4_to_uint8_v4(const float_v4 vec) {

@@ -8,6 +8,9 @@
 
 // random defines
 
+#define PACKED __attribute__((__packed__))
+#define ALIGNED __attribute__((aligned))
+
 #define EPSILON 1e-8
 #define PI 3.1415926535897932385
 

@@ -6,12 +6,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <def.h>
 #include <vec.h>
+#include <camera.h>
 
 #include "image.h"
-
-#define PACKED __attribute__((__packed__))
-#define ALIGNED __attribute__((aligned))
 
 struct Image {
 	uint32_t width;
@@ -87,7 +86,7 @@ struct Image *Image_flip_left_right(struct Image *img) {
 	return img;
 }
 
-int Image_save_as_ppm(const struct Image *img, const char *filename) {
+int Image_save_as_ppm(const struct Image *img, const char *filename, struct CameraOptions *opts) {
 	FILE *fp = NULL;
 
 	fp = fopen(filename, "w");
@@ -96,9 +95,26 @@ int Image_save_as_ppm(const struct Image *img, const char *filename) {
 		return 1;
 	}
 	
-	fprintf(fp, 
-			"P3\n"
-			"%u %u\n"
+	fprintf(fp, "P3\n");
+
+	if (opts != NULL) {
+		fprintf(fp, 
+		"# vertical_fov: %f\n"
+		"# focus_dist: %f\n"
+		"# defocus_angle: %f\n"
+		"# samples_per_pixel: %u\n"
+		"# max_depth: %u\n"
+		"# center: (%f, %f, %f)\n"
+		"# rotation_quart: (%f, %f, %f, %f)\n", // rotation quarternion
+			opts->vertical_fov,
+			opts->focus_dist, opts->defocus_angle,
+			opts->samples_per_pixel, opts->max_depth,
+			opts->center.x, opts->center.y, opts->center.z,
+			opts->rotation_quart.x, opts->rotation_quart.y, opts->rotation_quart.z, opts->rotation_quart.w
+		);
+	}
+
+	fprintf(fp, "%u %u\n"
 			"255\n",
 			img->width, img->height);
 

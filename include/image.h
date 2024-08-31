@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <vec.h>
+#include <camera.h>
 
 struct Image;
 
@@ -23,7 +24,9 @@ struct Image *Image_copy(const struct Image *img);
 // Flips an image upside down
 struct Image *Image_flip_top_bottom(struct Image *img);
 
-int Image_save_as_ppm(const struct Image *img, const char *filename);
+// saves image to a file
+// CameraOptions struct is optionaly NULL
+int Image_save_as_ppm(const struct Image *img, const char *filename, struct CameraOptions *opts);
 int Image_save_as_bmp(const struct Image *img, const char *filename);
 
 #endif /* IMAGE_H */

@@ -11,8 +11,8 @@
 struct Triangle {
 	Hittable hittable;
 	struct Material *mat;
-	float_v3 a, b, c;
 	float_v3 normal;
+	float_v3 a, b, c;
 };
 
 struct Triangle *Triangle_new(struct Triangle *tri, 

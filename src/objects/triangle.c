@@ -27,7 +27,6 @@ struct Triangle *Triangle_new(struct Triangle *tri,
 	return tri;
 }
 
-// FIXME: z position needs to be taken into account somehow
 bool Triangle_hit(const Hittable *obj, const Ray *r, 
 		Interval ray_t, struct HitRecord *record) {
 	struct Triangle *tri = (struct Triangle*)obj;
@@ -59,7 +58,7 @@ bool Triangle_hit(const Hittable *obj, const Ray *r,
 	// At this stage, we can calculate where the interseciton is on the line
 	float t = inv_det * float_v3_dot(edge2, s_cross_e1);
 
-	if (t <= EPSILON) {
+	if (!Interval_contains(ray_t, t)) {
 		return false;
 	}
 	

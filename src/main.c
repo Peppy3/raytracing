@@ -12,6 +12,7 @@
 
 #include <objects/sphere.h>
 #include <objects/triangle.h>
+#include <objects/mesh.h>
 
 #include <materials/lambertian.h>
 #include <materials/metal.h>
@@ -30,27 +31,22 @@ int main(void) {
 	// Camera
 
 	// TODO: full rotation in degrees and pass that to the camera
-	float yaw = 64.5593f;
-	float pitch = 46.6919f;
+	float pitch = 64.5593f;
+	float roll = 46.6919f;
 
 	struct CameraOptions cam_opts1 = {
 		.image_width = image_width,
 		.image_height = image_height,
 
-		.vertical_fov = 20.0f,
-		.focus_dist = 1.2f,
+		.vertical_fov = 28.0f,
+		.focus_dist = 0.5f,
 		.defocus_angle = 0.6f,
 
 		.max_depth = 30,
 		.samples_per_pixel = 64,
-
+		
 		.center = (point3){7.35889f, -6.92579f, 4.95831f},
-		.lookat = (point3){
-			.x = cosf(yaw) * cosf(pitch), 
-			.y = sinf(yaw) * cosf(pitch), 
-			.z = sin(pitch)
-		},
-		.vup = (float_v3){0.0f, 1.0f, 0.0f}
+		.rotation_quart = euler_to_quaternion(pitch, 0, roll),
 	};
 
 	struct Camera cam1;
@@ -60,39 +56,47 @@ int main(void) {
 	
 	// World
 
-	struct Lambertian mat_ground, mat_tri;
+	struct Lambertian mat_ground, mat_mesh;
 
 	Lambertian_new(&mat_ground, (float_v3){0.8f, 0.8f, 0.0f});
-	Lambertian_new(&mat_tri, (float_v3){0.6f, 0.4f, 0.8f});
-
+	Lambertian_new(&mat_mesh, (float_v3){0.6f, 0.4f, 0.8f});
+	
+	struct Mesh *cube = Mesh_new(MeshFileType_BinSTL, "cube.stl", &mat_mesh.mat);
+	if (cube == NULL) {
+		return 1;
+	}
+	
+	/*
 	Hittable tri_hit = {Triangle_hit};
 	//const size_t cube_tris = 12;
 	struct Triangle tris[12] = {
-		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1, -1}, {-1,  1, -1}, { 0,  0, -1}},
-		{tri_hit, &mat_tri.mat, { 1, -1, -1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  0, -1}},
+		{tri_hit, &mat_mesh.mat, { 1, -1, -1}, {-1, -1, -1}, {-1,  1, -1}, { 0,  0, -1}},
+		{tri_hit, &mat_mesh.mat, { 1, -1, -1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  0, -1}},
 		
-		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1,  1, -1}, { 1,  1,  1}, { 0,  1,  0}},
-		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  1,  0}},
+		{tri_hit, &mat_mesh.mat, {-1,  1,  1}, { 1,  1, -1}, { 1,  1,  1}, { 0,  1,  0}},
+		{tri_hit, &mat_mesh.mat, {-1,  1,  1}, { 1,  1, -1}, {-1,  1, -1}, { 0,  1,  0}},
 
-		{tri_hit, &mat_tri.mat, {-1, -1,  1}, {-1,  1, -1}, {-1, -1, -1}, {-1,  0,  0}},
-		{tri_hit, &mat_tri.mat, {-1, -1,  1}, {-1,  1, -1}, {-1,  1,  1}, {-1,  0,  0}},
+		{tri_hit, &mat_mesh.mat, {-1, -1,  1}, {-1,  1, -1}, {-1, -1, -1}, {-1,  0,  0}},
+		{tri_hit, &mat_mesh.mat, {-1, -1,  1}, {-1,  1, -1}, {-1,  1,  1}, {-1,  0,  0}},
 
-		{tri_hit, &mat_tri.mat, { 1,  1, -1}, { 1, -1,  1}, { 1,  1,  1}, { 1,  0,  0}},
-		{tri_hit, &mat_tri.mat, { 1,  1, -1}, { 1, -1,  1}, { 1, -1, -1}, { 1,  0,  0}},
+		{tri_hit, &mat_mesh.mat, { 1,  1, -1}, { 1, -1,  1}, { 1,  1,  1}, { 1,  0,  0}},
+		{tri_hit, &mat_mesh.mat, { 1,  1, -1}, { 1, -1,  1}, { 1, -1, -1}, { 1,  0,  0}},
 		
-		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1,  1}, {-1, -1, -1}, { 0, -1,  0}},
-		{tri_hit, &mat_tri.mat, { 1, -1, -1}, {-1, -1,  1}, { 1, -1,  1}, { 0, -1,  0}},
+		{tri_hit, &mat_mesh.mat, { 1, -1, -1}, {-1, -1,  1}, {-1, -1, -1}, { 0, -1,  0}},
+		{tri_hit, &mat_mesh.mat, { 1, -1, -1}, {-1, -1,  1}, { 1, -1,  1}, { 0, -1,  0}},
 
-		{tri_hit, &mat_tri.mat, {-1,  1,  1}, { 1, -1,  1}, { 1,  1,  1}, { 0,  0,  1}},
-		{tri_hit, &mat_tri.mat, {-1,  1,  1}, {-1, -1,  1}, { 1, -1,  1}, { 0,  0,  1}},
+		{tri_hit, &mat_mesh.mat, {-1,  1,  1}, { 1, -1,  1}, { 1,  1,  1}, { 0,  0,  1}},
+		{tri_hit, &mat_mesh.mat, {-1,  1,  1}, {-1, -1,  1}, { 1, -1,  1}, { 0,  0,  1}},
 	};
+	*/
 	
 	struct Sphere s_ground;
-	Sphere_new(&s_ground, (point3){0.0f, -100.5f, -1.0f}, 100.0f, &mat_ground.mat);
+	Sphere_new(&s_ground, (point3){0, 0, -101.0f}, 100.0f, &mat_ground.mat);
 
 	Hittable *hittable_list[] = {
-		//&s_ground.hittable, 
-		&tris[0].hittable,
+		&s_ground.hittable, 
+		Mesh_get_Hittable(cube),
+		/*&tris[0].hittable,
 		&tris[1].hittable,
 		&tris[2].hittable,
 		&tris[3].hittable,
@@ -103,14 +107,14 @@ int main(void) {
 		&tris[8].hittable,
 		&tris[9].hittable,
 		&tris[10].hittable,
-		&tris[11].hittable
+		&tris[11].hittable*/
 	};
 
 	struct World world = {
 		.cameras = cam_list,
 		.camera_list_len = 1,
 		.obj_list = hittable_list,
-		.obj_list_len = 12
+		.obj_list_len = 2
 	};
 
 
@@ -123,7 +127,7 @@ int main(void) {
 	}
 	
 	puts("Saving image\x07");
-	Image_save_as_bmp(img, "out.bmp");
+	Image_save_as_ppm(img, "out.ppm", &cam_opts1);
 
 	free(img);
 
