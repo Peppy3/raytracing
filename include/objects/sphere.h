@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+#include <object.h>
 #include <hittable.h>
 #include <material.h>
 #include <vec.h>
@@ -20,5 +21,19 @@ struct Sphere *Sphere_new(struct Sphere *s, point3 center, float radius, struct 
 bool Sphere_hit(const Hittable *obj, const Ray *r, 
 		Interval ray_t, struct HitRecord *record);
 
-#endif /* OBJECT_SPHERE_H */
 
+struct Sphere2 {
+	struct Object obj;
+	float_v3 center;
+	float radius;
+};
+
+struct Sphere2 *Sphere_new2(struct Sphere2 *s, point3 center, float radius, struct Shader *shader);
+
+bool Sphere_hit2(const struct Object *obj, const Ray *r,
+	float *t, struct HitInfo *hit_info);
+
+bool Sphere_hit3(const struct Object *obj, const Ray *r,
+	float *t, struct HitInfo *hit_info);
+
+#endif /* OBJECT_SPHERE_H */

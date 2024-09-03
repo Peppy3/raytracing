@@ -205,7 +205,7 @@ int Image_save_as_bmp(const struct Image *img, const char *filename) {
 		for (size_t j = 0; j < img->width; j++) {
 			size_t idx = i * img->width + j;
 			uint8_v4 tmp = img->data[idx];
-			bmp_row[j] = (uint8_v3){tmp.z, tmp.y, tmp.x};
+			bmp_row[j] = (uint8_v3){{tmp.z, tmp.y, tmp.x}};
 		}
 		fwrite(bmp_row, bmp_row_size, 1, fp);
 	}

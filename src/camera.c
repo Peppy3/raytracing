@@ -22,9 +22,8 @@ void Camera_new(struct Camera *cam, const struct CameraOptions *options) {
 	cam->viewport_width = cam->viewport_height * ((float)options->image_width / options->image_height);
 
 	// Calculate the u (rigth), v (up), w (backwars) unit basis vectors for the camera coordinate frame.
-	cam->w = float_v3_rotate_by_quaternion((float_v3){0, 0, 1}, options->rotation_quart);
-	//cam->v = float_v3_rotate_by_quaternion((float_v3){0, 1, 0}, options->rotation_quart);
-	cam->u = float_v3_rotate_by_quaternion((float_v3){1, 0, 0}, options->rotation_quart);
+	cam->w = float_v3_rotate_by_quaternion((float_v3){{0, 0, 1}}, options->rotation_quart);
+	cam->u = float_v3_rotate_by_quaternion((float_v3){{1, 0, 0}}, options->rotation_quart);
 	cam->v = float_v3_cross(cam->w, cam->u);
 
 	// calculate the vectors across the horizontal and vertical viewport edges
@@ -105,7 +104,7 @@ void Camera_new_old(struct Camera *cam, const struct CameraOptions *options) {
 static float_v3 sample_square(const struct Camera *cam) {
 	return float_v3_add(
 			cam->center,
-			(float_v3){random_float() - 0.5f, random_float() - 0.5f, 0.0f}
+			(float_v3){{random_float() - 0.5f, random_float() - 0.5f, 0.0f}}
 			);
 }
 

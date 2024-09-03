@@ -25,7 +25,7 @@ bool Dialectric_scatter(struct Material *mat, const Ray *r_in,
 		struct HitRecord *record, float_v3 *attenuation, Ray *scattered) {
 	struct Dialectric *d = (struct Dialectric*)mat;
 	
-	*attenuation = (float_v3){1.0f, 1.0f, 1.0f};
+	*attenuation = (float_v3){{1.0f, 1.0f, 1.0f}};
 	float ri = record->front_face ? (1.0f / d->refraction_index) : d->refraction_index;
 
 	float_v3 unit_direction = float_v3_unit_vector(r_in->direction);

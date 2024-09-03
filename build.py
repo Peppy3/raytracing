@@ -8,7 +8,7 @@
 #
 # See end of file for license information.
 
-import sys, os, argparse
+import sys, os, argparse, platform
 import json, hashlib
 import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -33,13 +33,14 @@ DEFAULT_CACHE_DIR = Path(__file__).parent / Path(CACHE_DIR)
 
 C_COMPILER: str = "cc"
 CFLAGS: tuple | None = ("-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-I./include")
-COPT: str = "-O3 -g3" # I never recommend using -O0
+COPT: str = "-O3 -ffast-math -g3" # I never recommend using -O0
 
+CPP_COMPILER: str = "cpp"
 CPPFLAGS: tuple | None = None # The standard cpp hook uses the c flags as well
 CPPOPT: str = "-O1"
 
 LINK_WITH: str = "cc"
-LINK_OPTS: str = "-O2 -g3"
+LINK_OPTS: str = "-O2 -pg"
 
 ################################################
 # End of configuable arguments
@@ -213,16 +214,29 @@ class Cache:
         self.cached_files.update({str(file): hsh})
 
 
+def get_arch():
+    ARCHITECTURE: dict = {"x86_64": "ARCH_X86_64", "AMD64": "ARCH_X86_64"}
+
+    arch = ARCHITECTURE.get(platform.machine())
+
+    if arch is None:
+        arch = "ARCH_UNKNOWN"
+
+    return ("-D", arch)
+
 @build_hooks.file_handler(".c")
 def cc(src, obj):
-    if CFLAGS is None:
-        return (C_COMPILER, COPT, "-c", src, "-o", obj)
+    arch = get_arch()
 
-    return (C_COMPILER, *CFLAGS, COPT, "-c", src, "-o", obj)
+    if CFLAGS is None:
+        return (C_COMPILER, *arch, COPT, "-c", src, "-o", obj)
+
+    return (C_COMPILER, *arch, *CFLAGS, COPT, "-c", src, "-o", obj)
 
 @build_hooks.file_handler(".cpp")
 def cxx(src, obj):
-    cmd = ["g++"]
+    arch = get_arch()
+    cmd = [CPP_COMPILER, *arch]
 
     if CFLAGS is not None:
         cmd.extend(CFLAGS)

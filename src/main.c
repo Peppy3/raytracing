@@ -45,7 +45,7 @@ int main(void) {
 		.max_depth = 30,
 		.samples_per_pixel = 64,
 		
-		.center = (point3){7.35889f, -6.92579f, 4.95831f},
+		.center = (point3){{7.35889f, -6.92579f, 4.95831f}},
 		.rotation_quart = euler_to_quaternion(pitch, 0, roll),
 	};
 
@@ -58,13 +58,13 @@ int main(void) {
 
 	struct Lambertian mat_ground, mat_mesh;
 
-	Lambertian_new(&mat_ground, (float_v3){0.8f, 0.8f, 0.0f});
-	Lambertian_new(&mat_mesh, (float_v3){0.6f, 0.4f, 0.8f});
+	Lambertian_new(&mat_ground, (float_v3){{0.8f, 0.8f, 0.0f}});
+	Lambertian_new(&mat_mesh, (float_v3){{0.6f, 0.4f, 0.8f}});
 	
-	struct Mesh *cube = Mesh_new(MeshFileType_BinSTL, "cube.stl", &mat_mesh.mat);
+	/*struct Mesh *cube = Mesh_new(MeshFileType_BinSTL, "cube.stl", &mat_mesh.mat);
 	if (cube == NULL) {
 		return 1;
-	}
+	}*/
 	
 	/*
 	Hittable tri_hit = {Triangle_hit};
@@ -90,12 +90,15 @@ int main(void) {
 	};
 	*/
 	
-	struct Sphere s_ground;
-	Sphere_new(&s_ground, (point3){0, 0, -101.0f}, 100.0f, &mat_ground.mat);
+	struct Sphere2 s_ground, s_center;
+	//Sphere_new(&s_ground, (point3){{0, 0, -101.0f}}, 100.0f, &mat_ground.mat);
+	Sphere_new2(&s_ground, (point3){{0, 0, -101.0f}}, 100.0f, NULL);
+	Sphere_new2(&s_center, (point3){{0, 0, 0}}, 0.5f, NULL);
 
-	Hittable *hittable_list[] = {
-		&s_ground.hittable, 
-		Mesh_get_Hittable(cube),
+	struct Object *hittable_list[] = {
+		&s_ground.obj,
+		&s_center.obj, 
+		//Mesh_get_Hittable(cube),
 		/*&tris[0].hittable,
 		&tris[1].hittable,
 		&tris[2].hittable,
@@ -110,7 +113,8 @@ int main(void) {
 		&tris[11].hittable*/
 	};
 
-	struct World world = {
+	struct World2 world = {
+		.background_color = {{0.051, 0.051, 0.051, 1}},
 		.cameras = cam_list,
 		.camera_list_len = 1,
 		.obj_list = hittable_list,
